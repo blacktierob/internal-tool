@@ -5,13 +5,17 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "vite build",
+    "build:with-types": "tsc -b && vite build",
+    "build:production": "NODE_ENV=production npm run build",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typecheck": "tsc -b",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "echo \"Add tests here\" && exit 0",
+    "deploy": "vercel --prod"
   },
   "dependencies": {
     "@mantine/core": "^8.2.8",
@@ -20,10 +24,13 @@
     "@mantine/hooks": "^8.2.8",
     "@mantine/modals": "^8.2.8",
     "@mantine/notifications": "^8.2.8",
+    "@sentry/react": "^10.11.0",
+    "@sentry/vite-plugin": "^4.3.0",
     "@supabase/supabase-js": "^2.57.2",
     "@tabler/icons-react": "^3.34.1",
     "dayjs": "^1.11.18",
     "framer-motion": "^12.23.12",
+    "posthog-js": "^1.262.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-router-dom": "^7.8.2"
