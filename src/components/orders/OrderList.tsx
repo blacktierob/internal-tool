@@ -25,7 +25,8 @@ import {
   IconCalendar,
   IconMapPin,
   IconRefresh,
-  IconUsers
+  IconUsers,
+  IconX
 } from '@tabler/icons-react'
 import { useDisclosure } from '@mantine/hooks'
 import { modals } from '@mantine/modals'
@@ -57,6 +58,9 @@ const STATUS_COLORS: Record<string, string> = {
 
 export function OrderList({ onOrderSelect, selectable = false }: OrderListProps) {
   const navigate = useNavigate()
+  const [swipedId, setSwipedId] = useState<string | null>(null)
+  const [touchStartX, setTouchStartX] = useState<number | null>(null)
+  const [touchDeltaX, setTouchDeltaX] = useState<number>(0)
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
   const [filters, setFilters] = useState<OrderSearchFilters>({})
@@ -179,88 +183,113 @@ export function OrderList({ onOrderSelect, selectable = false }: OrderListProps)
     })
   }
 
-  const rows = orders.map((order) => (
-    <Table.Tr 
-      key={order.id}
-      style={{ cursor: 'pointer', minHeight: '64px' }}
-      onClick={() => {
-        if (selectable) {
-          onOrderSelect?.(order)
-        } else {
-          goToOrder(order)
-        }
-      }}
-    >
-      <Table.Td style={{ minHeight: '64px', verticalAlign: 'middle', padding: '12px' }}>
-        <div>
-          <Text fw={600} size="md">{order.customer_name}</Text>
-          <Group gap={6} mt={4}>
-            <IconCalendar size={14} color="green" />
-            <Text size="sm">{formatDate(order.wedding_date)}</Text>
-          </Group>
-          {/* Show status on mobile when status column is hidden */}
-          <Group gap={4} hiddenFrom="sm" mt={6}>
-            <Badge color={STATUS_COLORS[order.status] || 'gray'} size="sm">
-              {order.status.replace('_', ' ').toUpperCase()}
-            </Badge>
-          </Group>
-        </div>
-      </Table.Td>
+  const rows = orders.map((order) => {
+    const isSwiped = swipedId === order.id
+    const translateX = isSwiped ? -72 : Math.min(0, Math.max(-72, touchDeltaX))
 
-      <Table.Td style={{ minHeight: '64px', verticalAlign: 'middle', padding: '12px' }}>
-        {order.wedding_venue && (
-          <Group gap={4}>
-            <IconMapPin size={14} color="gray" />
-            <Text size="sm" c="dimmed">{order.wedding_venue}</Text>
-          </Group>
-        )}
-      </Table.Td>
-      
-      <Table.Td style={{ minHeight: '64px', verticalAlign: 'middle', padding: '12px' }} visibleFrom="sm">
-        <Badge color={STATUS_COLORS[order.status] || 'gray'} size="sm">
-          {order.status.replace('_', ' ').toUpperCase()}
-        </Badge>
-      </Table.Td>
-      
-      <Table.Td style={{ minHeight: '64px', verticalAlign: 'middle', padding: '12px' }} visibleFrom="lg">
-        <Group gap={4}>
-          <IconUsers size={14} color="gray" />
-          <Text size="sm">
-            {order.actual_members}/{order.total_members}
-          </Text>
-        </Group>
-      </Table.Td>
-      
-      {!selectable && (
-        <Table.Td style={{ minHeight: '64px', verticalAlign: 'middle', padding: '12px' }}>
-          <Group gap="xs">
-            <Tooltip label="Edit Order">
-              <ActionIcon
-                variant="light"
-                color="orange"
-                onClick={(e) => { e.stopPropagation(); handleEditOrder(order) }}
-                size="lg"
-                style={{ minWidth: '44px', minHeight: '44px' }}
-              >
-                <IconEdit size={18} />
-              </ActionIcon>
-            </Tooltip>
-            <Tooltip label="Delete Order">
-              <ActionIcon
-                variant="light"
-                color="red"
-                onClick={(e) => { e.stopPropagation(); handleDeleteOrder(order) }}
-                size="lg"
-                style={{ minWidth: '44px', minHeight: '44px' }}
-              >
-                <IconTrash size={18} />
-              </ActionIcon>
-            </Tooltip>
-          </Group>
+    const onTouchStart = (e: React.TouchEvent) => {
+      setTouchStartX(e.touches[0].clientX)
+      setSwipedId(null)
+      setTouchDeltaX(0)
+    }
+
+    const onTouchMove = (e: React.TouchEvent) => {
+      if (touchStartX === null) return
+      const dx = e.touches[0].clientX - touchStartX
+      if (dx < 0) {
+        setTouchDeltaX(dx)
+      }
+    }
+
+    const onTouchEnd = () => {
+      if (touchDeltaX <= -48) {
+        setSwipedId(order.id)
+      } else {
+        setSwipedId(null)
+      }
+      setTouchStartX(null)
+      setTouchDeltaX(0)
+    }
+
+    return (
+      <Table.Tr
+        key={order.id}
+        style={{ cursor: 'pointer', minHeight: '64px', position: 'relative' }}
+        onClick={() => {
+          if (selectable) {
+            onOrderSelect?.(order)
+          } else {
+            goToOrder(order)
+          }
+        }}
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+      >
+        {/* Hidden delete action behind row */}
+        <td
+          style={{
+            position: 'absolute',
+            top: 0,
+            right: 0,
+            height: '100%',
+            width: '72px',
+            backgroundColor: 'rgba(244,67,54,0.1)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            pointerEvents: 'none'
+          }}
+        >
+          <ActionIcon
+            color="red"
+            variant="filled"
+            size="lg"
+            style={{ pointerEvents: 'auto' }}
+            onClick={(e) => {
+              e.stopPropagation()
+              handleDeleteOrder(order)
+            }}
+            aria-label="Delete order"
+          >
+            <IconX size={18} />
+          </ActionIcon>
+        </td>
+
+        <Table.Td style={{ minHeight: '64px', verticalAlign: 'middle', padding: 0 }} colSpan={4}>
+          <div
+            style={{
+              display: 'block',
+              padding: '12px',
+              transform: `translateX(${translateX}px)`,
+              transition: touchStartX === null ? 'transform 150ms ease' : 'none'
+            }}
+          >
+            <Group justify="space-between" align="start" gap="sm">
+              <div>
+                <Text fw={600} size="md">{order.customer_name}</Text>
+                <Group gap={6} mt={4}>
+                  <IconCalendar size={14} color="green" />
+                  <Text size="sm">{formatDate(order.wedding_date)}</Text>
+                </Group>
+              </div>
+              <Group gap={8} visibleFrom="sm">
+                <Badge color={STATUS_COLORS[order.status] || 'gray'} size="sm">
+                  {order.status.replace('_', ' ').toUpperCase()}
+                </Badge>
+                <Group gap={4} visibleFrom="lg">
+                  <IconUsers size={14} color="gray" />
+                  <Text size="sm">
+                    {order.actual_members}/{order.total_members}
+                  </Text>
+                </Group>
+              </Group>
+            </Group>
+          </div>
         </Table.Td>
-      )}
-    </Table.Tr>
-  ))
+      </Table.Tr>
+    )
+  })
 
   return (
     <Stack gap="md">
@@ -355,15 +384,10 @@ export function OrderList({ onOrderSelect, selectable = false }: OrderListProps)
           </Grid.Col>
         </Grid>
 
-        <Table.ScrollContainer minWidth={820} type="native">
         <Table striped highlightOnHover style={{ minWidth: '100%' }}>
           <Table.Thead>
             <Table.Tr style={{ minHeight: '48px' }}>
-              <Table.Th style={{ minHeight: '48px', verticalAlign: 'middle' }}>Customer & Date</Table.Th>
-              <Table.Th style={{ minHeight: '48px', verticalAlign: 'middle' }}>Venue</Table.Th>
-              <Table.Th style={{ minHeight: '48px', verticalAlign: 'middle' }} visibleFrom="sm">Status</Table.Th>
-              <Table.Th style={{ minHeight: '48px', verticalAlign: 'middle' }} visibleFrom="lg">Members</Table.Th>
-              {!selectable && <Table.Th style={{ minHeight: '48px', verticalAlign: 'middle' }}>Actions</Table.Th>}
+              <Table.Th style={{ minHeight: '48px', verticalAlign: 'middle' }}>Order</Table.Th>
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
@@ -371,7 +395,7 @@ export function OrderList({ onOrderSelect, selectable = false }: OrderListProps)
               rows
             ) : (
               <Table.Tr>
-                <Table.Td colSpan={selectable ? 5 : 6} style={{ minHeight: '120px', verticalAlign: 'middle' }}>
+                <Table.Td colSpan={1} style={{ minHeight: '120px', verticalAlign: 'middle' }}>
                   <Text ta="center" c="dimmed" py="xl" size="md">
                     {loading ? 'Loading orders...' : 'No orders found'}
                   </Text>
@@ -380,7 +404,6 @@ export function OrderList({ onOrderSelect, selectable = false }: OrderListProps)
             )}
           </Table.Tbody>
         </Table>
-        </Table.ScrollContainer>
 
         {total > limit && (
           <Group justify="center" mt="md">
