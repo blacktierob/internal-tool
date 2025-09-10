@@ -20,12 +20,8 @@ import {
 import {
   IconSearch,
   IconPlus,
-  IconEdit,
-  IconTrash,
   IconCalendar,
-  IconMapPin,
   IconRefresh,
-  IconUsers,
   IconX
 } from '@tabler/icons-react'
 import { useDisclosure } from '@mantine/hooks'
@@ -58,9 +54,6 @@ const STATUS_COLORS: Record<string, string> = {
 
 export function OrderList({ onOrderSelect, selectable = false }: OrderListProps) {
   const navigate = useNavigate()
-  const [swipedId, setSwipedId] = useState<string | null>(null)
-  const [touchStartX, setTouchStartX] = useState<number | null>(null)
-  const [touchDeltaX, setTouchDeltaX] = useState<number>(0)
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
   const [filters, setFilters] = useState<OrderSearchFilters>({})
@@ -183,113 +176,44 @@ export function OrderList({ onOrderSelect, selectable = false }: OrderListProps)
     })
   }
 
-  const rows = orders.map((order) => {
-    const isSwiped = swipedId === order.id
-    const translateX = isSwiped ? -72 : Math.min(0, Math.max(-72, touchDeltaX))
-
-    const onTouchStart = (e: React.TouchEvent) => {
-      setTouchStartX(e.touches[0].clientX)
-      setSwipedId(null)
-      setTouchDeltaX(0)
-    }
-
-    const onTouchMove = (e: React.TouchEvent) => {
-      if (touchStartX === null) return
-      const dx = e.touches[0].clientX - touchStartX
-      if (dx < 0) {
-        setTouchDeltaX(dx)
-      }
-    }
-
-    const onTouchEnd = () => {
-      if (touchDeltaX <= -48) {
-        setSwipedId(order.id)
-      } else {
-        setSwipedId(null)
-      }
-      setTouchStartX(null)
-      setTouchDeltaX(0)
-    }
-
-    return (
-      <Table.Tr
-        key={order.id}
-        style={{ cursor: 'pointer', minHeight: '64px', position: 'relative' }}
-        onClick={() => {
-          if (selectable) {
-            onOrderSelect?.(order)
-          } else {
-            goToOrder(order)
-          }
-        }}
-        onTouchStart={onTouchStart}
-        onTouchMove={onTouchMove}
-        onTouchEnd={onTouchEnd}
-      >
-        {/* Hidden delete action behind row */}
-        <td
-          style={{
-            position: 'absolute',
-            top: 0,
-            right: 0,
-            height: '100%',
-            width: '72px',
-            backgroundColor: 'rgba(244,67,54,0.1)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            pointerEvents: 'none'
-          }}
-        >
-          <ActionIcon
-            color="red"
-            variant="filled"
-            size="lg"
-            style={{ pointerEvents: 'auto' }}
-            onClick={(e) => {
-              e.stopPropagation()
-              handleDeleteOrder(order)
-            }}
-            aria-label="Delete order"
-          >
-            <IconX size={18} />
-          </ActionIcon>
-        </td>
-
-        <Table.Td style={{ minHeight: '64px', verticalAlign: 'middle', padding: 0 }} colSpan={4}>
-          <div
-            style={{
-              display: 'block',
-              padding: '12px',
-              transform: `translateX(${translateX}px)`,
-              transition: touchStartX === null ? 'transform 150ms ease' : 'none'
-            }}
-          >
-            <Group justify="space-between" align="start" gap="sm">
-              <div>
-                <Text fw={600} size="md">{order.customer_name}</Text>
-                <Group gap={6} mt={4}>
-                  <IconCalendar size={14} color="green" />
-                  <Text size="sm">{formatDate(order.wedding_date)}</Text>
-                </Group>
-              </div>
-              <Group gap={8} visibleFrom="sm">
-                <Badge color={STATUS_COLORS[order.status] || 'gray'} size="sm">
-                  {order.status.replace('_', ' ').toUpperCase()}
-                </Badge>
-                <Group gap={4} visibleFrom="lg">
-                  <IconUsers size={14} color="gray" />
-                  <Text size="sm">
-                    {order.actual_members}/{order.total_members}
-                  </Text>
-                </Group>
-              </Group>
+  const rows = orders.map((order) => (
+    <Table.Tr
+      key={order.id}
+      style={{ cursor: 'pointer', minHeight: '56px' }}
+      onClick={() => {
+        if (selectable) {
+          onOrderSelect?.(order)
+        } else {
+          goToOrder(order)
+        }
+      }}
+    >
+      <Table.Td style={{ verticalAlign: 'middle', padding: '10px 12px' }}>
+        <Group justify="space-between" align="center" gap="sm" wrap="nowrap">
+          <Group gap={8} wrap="nowrap" style={{ minWidth: 0, flex: 1 }}>
+            <Text fw={600} size="sm" style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {order.customer_name}
+            </Text>
+            <Group gap={4} wrap="nowrap" c="dimmed" style={{ flex: '0 0 auto' }}>
+              <IconCalendar size={14} />
+              <Text size="sm">{formatSimpleDate(order.wedding_date)}</Text>
             </Group>
-          </div>
-        </Table.Td>
-      </Table.Tr>
-    )
-  })
+          </Group>
+          <Tooltip label="Delete order">
+            <ActionIcon
+              color="red"
+              variant="subtle"
+              size="md"
+              onClick={(e) => { e.stopPropagation(); handleDeleteOrder(order) }}
+              aria-label="Delete order"
+            >
+              <IconX size={16} />
+            </ActionIcon>
+          </Tooltip>
+        </Group>
+      </Table.Td>
+    </Table.Tr>
+  ))
 
   return (
     <Stack gap="md">
