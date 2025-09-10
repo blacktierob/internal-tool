@@ -1,0 +1,45 @@
+{
+  "name": "black-tie-menswear",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "tsc -b",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@mantine/core": "^8.2.8",
+    "@mantine/dates": "^8.2.8",
+    "@mantine/form": "^8.2.8",
+    "@mantine/hooks": "^8.2.8",
+    "@mantine/modals": "^8.2.8",
+    "@mantine/notifications": "^8.2.8",
+    "@supabase/supabase-js": "^2.57.2",
+    "@tabler/icons-react": "^3.34.1",
+    "dayjs": "^1.11.18",
+    "framer-motion": "^12.23.12",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "react-router-dom": "^7.8.2"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.33.0",
+    "@types/react": "^19.1.10",
+    "@types/react-dom": "^19.1.7",
+    "@vitejs/plugin-react": "^5.0.0",
+    "eslint": "^9.33.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.20",
+    "globals": "^16.3.0",
+    "prettier": "^3.6.2",
+    "typescript": "~5.8.3",
+    "typescript-eslint": "^8.39.1",
+    "vite": "^7.1.2"
+  }
+}
