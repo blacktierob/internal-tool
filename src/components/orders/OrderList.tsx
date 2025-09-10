@@ -15,15 +15,13 @@ import {
   Alert,
   LoadingOverlay,
   Tooltip,
-  Select,
-  ScrollArea
+  Select
 } from '@mantine/core'
 import {
   IconSearch,
   IconPlus,
   IconEdit,
   IconTrash,
-  IconEye,
   IconCalendar,
   IconMapPin,
   IconRefresh,
@@ -142,7 +140,7 @@ export function OrderList({ onOrderSelect, selectable = false }: OrderListProps)
     navigate(ROUTES.ORDER_DETAIL.replace(':id', orderId))
   }
 
-  const handleViewOrder = (order: OrderSummary) => {
+  const goToOrder = (order: OrderSummary) => {
     navigate(ROUTES.ORDER_DETAIL.replace(':id', order.id))
   }
 
@@ -184,34 +182,38 @@ export function OrderList({ onOrderSelect, selectable = false }: OrderListProps)
   const rows = orders.map((order) => (
     <Table.Tr 
       key={order.id}
-      style={{ cursor: selectable ? 'pointer' : 'default', minHeight: '64px' }}
-      onClick={() => selectable && onOrderSelect?.(order)}
+      style={{ cursor: 'pointer', minHeight: '64px' }}
+      onClick={() => {
+        if (selectable) {
+          onOrderSelect?.(order)
+        } else {
+          goToOrder(order)
+        }
+      }}
     >
       <Table.Td style={{ minHeight: '64px', verticalAlign: 'middle', padding: '12px' }}>
-        <Group gap={4}>
-          <IconCalendar size={16} color="green" />
-          <div>
-            <Text fw={500} size="md">{formatDate(order.wedding_date)}</Text>
-          </div>
-        </Group>
-      </Table.Td>
-
-      <Table.Td style={{ minHeight: '64px', verticalAlign: 'middle', padding: '12px' }}>
         <div>
-          <Text fw={500} size="md">{order.customer_name}</Text>
-          {order.wedding_venue && (
-            <Group gap={4} mt={2}>
-              <IconMapPin size={14} color="gray" />
-              <Text size="sm" c="dimmed">{order.wedding_venue}</Text>
-            </Group>
-          )}
+          <Text fw={600} size="md">{order.customer_name}</Text>
+          <Group gap={6} mt={4}>
+            <IconCalendar size={14} color="green" />
+            <Text size="sm">{formatDate(order.wedding_date)}</Text>
+          </Group>
           {/* Show status on mobile when status column is hidden */}
-          <Group gap={4} hiddenFrom="sm" mt={4}>
+          <Group gap={4} hiddenFrom="sm" mt={6}>
             <Badge color={STATUS_COLORS[order.status] || 'gray'} size="sm">
               {order.status.replace('_', ' ').toUpperCase()}
             </Badge>
           </Group>
         </div>
+      </Table.Td>
+
+      <Table.Td style={{ minHeight: '64px', verticalAlign: 'middle', padding: '12px' }}>
+        {order.wedding_venue && (
+          <Group gap={4}>
+            <IconMapPin size={14} color="gray" />
+            <Text size="sm" c="dimmed">{order.wedding_venue}</Text>
+          </Group>
+        )}
       </Table.Td>
       
       <Table.Td style={{ minHeight: '64px', verticalAlign: 'middle', padding: '12px' }} visibleFrom="sm">
@@ -232,22 +234,11 @@ export function OrderList({ onOrderSelect, selectable = false }: OrderListProps)
       {!selectable && (
         <Table.Td style={{ minHeight: '64px', verticalAlign: 'middle', padding: '12px' }}>
           <Group gap="xs">
-            <Tooltip label="View Order Details">
-              <ActionIcon
-                variant="light"
-                color="blue"
-                onClick={() => handleViewOrder(order)}
-                size="lg"
-                style={{ minWidth: '44px', minHeight: '44px' }}
-              >
-                <IconEye size={18} />
-              </ActionIcon>
-            </Tooltip>
             <Tooltip label="Edit Order">
               <ActionIcon
                 variant="light"
                 color="orange"
-                onClick={() => handleEditOrder(order)}
+                onClick={(e) => { e.stopPropagation(); handleEditOrder(order) }}
                 size="lg"
                 style={{ minWidth: '44px', minHeight: '44px' }}
               >
@@ -258,7 +249,7 @@ export function OrderList({ onOrderSelect, selectable = false }: OrderListProps)
               <ActionIcon
                 variant="light"
                 color="red"
-                onClick={() => handleDeleteOrder(order)}
+                onClick={(e) => { e.stopPropagation(); handleDeleteOrder(order) }}
                 size="lg"
                 style={{ minWidth: '44px', minHeight: '44px' }}
               >
@@ -368,8 +359,8 @@ export function OrderList({ onOrderSelect, selectable = false }: OrderListProps)
         <Table striped highlightOnHover style={{ minWidth: '100%' }}>
           <Table.Thead>
             <Table.Tr style={{ minHeight: '48px' }}>
-              <Table.Th style={{ minHeight: '48px', verticalAlign: 'middle' }}>Function Date</Table.Th>
-              <Table.Th style={{ minHeight: '48px', verticalAlign: 'middle' }}>Customer & Venue</Table.Th>
+              <Table.Th style={{ minHeight: '48px', verticalAlign: 'middle' }}>Customer & Date</Table.Th>
+              <Table.Th style={{ minHeight: '48px', verticalAlign: 'middle' }}>Venue</Table.Th>
               <Table.Th style={{ minHeight: '48px', verticalAlign: 'middle' }} visibleFrom="sm">Status</Table.Th>
               <Table.Th style={{ minHeight: '48px', verticalAlign: 'middle' }} visibleFrom="lg">Members</Table.Th>
               {!selectable && <Table.Th style={{ minHeight: '48px', verticalAlign: 'middle' }}>Actions</Table.Th>}

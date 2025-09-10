@@ -20,7 +20,6 @@ import {
   IconPlus,
   IconEdit,
   IconTrash,
-  IconEye,
   IconPhone,
   IconMail,
   IconMapPin,
@@ -90,7 +89,7 @@ export function CustomerList({ onCustomerSelect, selectable = false }: CustomerL
     openForm()
   }
 
-  const handleViewCustomer = (customer: Customer) => {
+  const goToCustomer = (customer: Customer) => {
     navigate(ROUTES.CUSTOMER_DETAIL.replace(':id', customer.id))
   }
 
@@ -160,8 +159,14 @@ export function CustomerList({ onCustomerSelect, selectable = false }: CustomerL
   const rows = customers.map((customer) => (
     <Table.Tr 
       key={customer.id}
-      style={{ cursor: selectable ? 'pointer' : 'default', minHeight: '64px' }}
-      onClick={() => selectable && onCustomerSelect?.(customer)}
+      style={{ cursor: 'pointer', minHeight: '64px' }}
+      onClick={() => {
+        if (selectable) {
+          onCustomerSelect?.(customer)
+        } else {
+          goToCustomer(customer)
+        }
+      }}
     >
       <Table.Td style={{ minHeight: '64px', verticalAlign: 'middle', padding: '12px' }}>
         <Group gap="sm">
@@ -217,22 +222,11 @@ export function CustomerList({ onCustomerSelect, selectable = false }: CustomerL
       {!selectable && (
         <Table.Td style={{ minHeight: '64px', verticalAlign: 'middle', padding: '12px' }}>
           <Group gap="xs">
-            <Tooltip label="View Customer Details">
-              <ActionIcon
-                variant="light"
-                color="green"
-                onClick={() => handleViewCustomer(customer)}
-                size="lg"
-                style={{ minWidth: '44px', minHeight: '44px' }}
-              >
-                <IconEye size={18} />
-              </ActionIcon>
-            </Tooltip>
             <Tooltip label="Edit Customer">
               <ActionIcon
                 variant="light"
                 color="blue"
-                onClick={() => handleEditCustomer(customer)}
+                onClick={(e) => { e.stopPropagation(); handleEditCustomer(customer) }}
                 size="lg"
                 style={{ minWidth: '44px', minHeight: '44px' }}
               >
@@ -243,7 +237,7 @@ export function CustomerList({ onCustomerSelect, selectable = false }: CustomerL
               <ActionIcon
                 variant="light"
                 color="red"
-                onClick={() => handleDeleteCustomer(customer)}
+                onClick={(e) => { e.stopPropagation(); handleDeleteCustomer(customer) }}
                 size="lg"
                 style={{ minWidth: '44px', minHeight: '44px' }}
               >

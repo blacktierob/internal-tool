@@ -398,3 +398,5 @@ The system is currently running without any known issues and is ready for Stage 
 **Follow-ups:**
 - Consider reducing component sizes (`size="sm"`) on xs for dense screens.
 - Evaluate Dashboard widgets for xs stacking and spacing.
+
+Update (2025-09-10): Removed phone bottom navigation in favor of burger menu per feedback; kept other mobile table improvements (row click, scroll containers).
