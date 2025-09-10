@@ -357,3 +357,44 @@ When reporting new issues, please include:
 - **Page Load Time:** < 2 seconds
 
 The system is currently running without any known issues and is ready for Stage 3 development! 🚀
+#### Issue #005: Full Mobile Breakpoint Audit
+**Status:** ? **RESOLVED**  
+**Date Reported:** September 10, 2025  
+**Date Resolved:** September 10, 2025  
+**Severity:** High  
+
+**Problem:**
+- On phones, screens felt cramped with key actions competing for space.
+- Data tables could overflow horizontally on small screens.
+- Navigation required too many taps due to hidden links.
+
+**Root Cause:**
+1. Tables did not provide horizontal scroll affordance on small screens.
+2. Top actions and titles sat on a single line without wrapping.
+3. No dedicated bottom navigation for phones as per UI/UX spec.
+
+**Resolution:**
+1. Added mobile bottom navigation (phones only) to surface primary destinations.
+2. Wrapped tables in responsive scroll containers to prevent overflow.
+3. Enabled wrapping in page header action groups to avoid crowding.
+
+**Code Changes:**
+- `src/components/layout/AppLayout.tsx`
+  - Added phone-only bottom nav via AppShell.Footer with primary routes.
+- `src/components/orders/OrderList.tsx`
+  - Wrapped table in Table.ScrollContainer (minWidth=820) and enabled Group wrap.
+- `src/components/customers/CustomerList.tsx`
+  - Wrapped table in Table.ScrollContainer (minWidth=720).
+- `src/components/customers/CustomerDetailView.tsx`
+  - Wrapped order/member tables in Table.ScrollContainer (minWidth=720).
+- `src/components/orders/OrderDetailView.tsx`
+  - Wrapped members and garments tables in Table.ScrollContainer.
+
+**Testing Notes:**
+- Verified columns hide appropriately at sm/md/lg breakpoints.
+- Confirmed no horizontal scroll on body; scroll stays within tables.
+- Footer appears only below 768px; AppShell adjusts main area accordingly.
+
+**Follow-ups:**
+- Consider reducing component sizes (`size="sm"`) on xs for dense screens.
+- Evaluate Dashboard widgets for xs stacking and spacing.

@@ -15,7 +15,8 @@ import {
   Alert,
   LoadingOverlay,
   Tooltip,
-  Select
+  Select,
+  ScrollArea
 } from '@mantine/core'
 import {
   IconSearch,
@@ -287,7 +288,7 @@ export function OrderList({ onOrderSelect, selectable = false }: OrderListProps)
           </Alert>
         )}
 
-        <Group justify="space-between" mb="md">
+        <Group justify="space-between" mb="md" wrap="wrap">
           <Text size="lg" fw={600}>
             Orders ({total})
           </Text>
@@ -363,6 +364,7 @@ export function OrderList({ onOrderSelect, selectable = false }: OrderListProps)
           </Grid.Col>
         </Grid>
 
+        <Table.ScrollContainer minWidth={820} type="native">
         <Table striped highlightOnHover style={{ minWidth: '100%' }}>
           <Table.Thead>
             <Table.Tr style={{ minHeight: '48px' }}>
@@ -387,6 +389,7 @@ export function OrderList({ onOrderSelect, selectable = false }: OrderListProps)
             )}
           </Table.Tbody>
         </Table>
+        </Table.ScrollContainer>
 
         {total > limit && (
           <Group justify="center" mt="md">

@@ -28,6 +28,7 @@ export function AppLayout({ children }: AppLayoutProps) {
   const [opened, { toggle }] = useDisclosure()
   const location = useLocation()
   const isMobile = useMediaQuery('(max-width: 768px)')
+  const isPhone = useMediaQuery('(max-width: 767px)')
   const isBurgerMenuActive = useMediaQuery('(max-width: 1024px)')
   const navigate = useNavigate()
   const { logout } = useAuth()
@@ -132,6 +133,50 @@ export function AppLayout({ children }: AppLayoutProps) {
       <AppShell.Main>
         {children}
       </AppShell.Main>
+
+      {/* Bottom navigation for phones */}
+      {isPhone && (
+        <AppShell.Footer>
+          <Group h={56} px="md" justify="space-around">
+            <Button
+              component={Link}
+              to={ROUTES.DASHBOARD}
+              variant={location.pathname === ROUTES.DASHBOARD ? 'filled' : 'subtle'}
+              leftSection={<IconDashboard style={{ width: rem(18), height: rem(18) }} />}
+              size="xs"
+            >
+              Dashboard
+            </Button>
+            <Button
+              component={Link}
+              to={ROUTES.CUSTOMERS}
+              variant={location.pathname === ROUTES.CUSTOMERS ? 'filled' : 'subtle'}
+              leftSection={<IconUsers style={{ width: rem(18), height: rem(18) }} />}
+              size="xs"
+            >
+              Customers
+            </Button>
+            <Button
+              component={Link}
+              to={ROUTES.ORDERS}
+              variant={location.pathname === ROUTES.ORDERS ? 'filled' : 'subtle'}
+              leftSection={<IconShirt style={{ width: rem(18), height: rem(18) }} />}
+              size="xs"
+            >
+              Orders
+            </Button>
+            <Button
+              component={Link}
+              to={ROUTES.SETTINGS}
+              variant={location.pathname === ROUTES.SETTINGS ? 'filled' : 'subtle'}
+              leftSection={<IconSettings style={{ width: rem(18), height: rem(18) }} />}
+              size="xs"
+            >
+              Settings
+            </Button>
+          </Group>
+        </AppShell.Footer>
+      )}
     </AppShell>
   )
 }

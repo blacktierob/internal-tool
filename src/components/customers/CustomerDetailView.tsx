@@ -358,6 +358,7 @@ export function CustomerDetailView() {
             </Group>
 
             {ownOrders.length > 0 ? (
+              <Table.ScrollContainer minWidth={720} type="native">
               <Table striped highlightOnHover>
                 <Table.Thead>
                   <Table.Tr>
@@ -422,6 +423,7 @@ export function CustomerDetailView() {
                   ))}
                 </Table.Tbody>
               </Table>
+              </Table.ScrollContainer>
             ) : (
               <Paper p="xl" ta="center">
                 <IconCrown size={48} color="gray" style={{ margin: '0 auto 16px' }} />
@@ -442,6 +444,7 @@ export function CustomerDetailView() {
             </Group>
 
             {memberOrders.length > 0 ? (
+              <Table.ScrollContainer minWidth={720} type="native">
               <Table striped highlightOnHover>
                 <Table.Thead>
                   <Table.Tr>
@@ -509,6 +512,7 @@ export function CustomerDetailView() {
                   })}
                 </Table.Tbody>
               </Table>
+              </Table.ScrollContainer>
             ) : (
               <Paper p="xl" ta="center">
                 <IconUsers size={48} color="gray" style={{ margin: '0 auto 16px' }} />

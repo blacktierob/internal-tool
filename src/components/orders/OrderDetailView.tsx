@@ -438,6 +438,7 @@ export function OrderDetailView() {
             </Group>
 
             {members.length > 0 ? (
+              <Table.ScrollContainer minWidth={720} type="native">
               <Table striped highlightOnHover>
                 <Table.Thead>
                   <Table.Tr>
@@ -554,6 +555,7 @@ export function OrderDetailView() {
                   ))}
                 </Table.Tbody>
               </Table>
+              </Table.ScrollContainer>
             ) : (
               <Paper p="xl" ta="center">
                 <IconUsers size={48} color="gray" style={{ margin: '0 auto 16px' }} />
@@ -664,6 +666,7 @@ export function OrderDetailView() {
             <Card withBorder padding="md">
               <Text size="lg" fw={600} mb="md">Assigned Garments</Text>
               {selectedMember.member_garments && selectedMember.member_garments.length > 0 ? (
+                <Table.ScrollContainer minWidth={600} type="native">
                 <Table striped>
                   <Table.Thead>
                     <Table.Tr>
@@ -694,6 +697,7 @@ export function OrderDetailView() {
                     ))}
                   </Table.Tbody>
                 </Table>
+                </Table.ScrollContainer>
               ) : (
                 <Text c="dimmed" ta="center" py="xl">No garments assigned yet</Text>
               )}

@@ -339,6 +339,7 @@ export function CustomerList({ onCustomerSelect, selectable = false }: CustomerL
           </Grid.Col>
         </Grid>
 
+        <Table.ScrollContainer minWidth={720} type="native">
         <Table striped highlightOnHover style={{ minWidth: '100%' }}>
           <Table.Thead>
             <Table.Tr style={{ minHeight: '48px' }}>
@@ -363,6 +364,7 @@ export function CustomerList({ onCustomerSelect, selectable = false }: CustomerL
             )}
           </Table.Tbody>
         </Table>
+        </Table.ScrollContainer>
 
         {total > limit && (
           <Group justify="center" mt="md">
