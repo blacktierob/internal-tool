@@ -27,6 +27,7 @@ interface AppLayoutProps {
 export function AppLayout({ children }: AppLayoutProps) {
   const [opened, { toggle }] = useDisclosure()
   const location = useLocation()
+  const isMobile = useMediaQuery('(max-width: 768px)')
   const isBurgerMenuActive = useMediaQuery('(max-width: 1024px)')
   const navigate = useNavigate()
   const { logout } = useAuth()
@@ -51,54 +52,59 @@ export function AppLayout({ children }: AppLayoutProps) {
 
   return (
     <AppShell
-      header={{ height: 60 }}
+      header={{ height: isMobile ? 56 : 64 }}
       navbar={{ 
-        width: 300, 
+        width: isMobile ? 280 : 300, 
         breakpoint: 'md', 
         collapsed: { mobile: !opened } 
       }}
-      padding="md"
+      padding={isMobile ? 'xs' : 'md'}
     >
       <AppShell.Header>
-        <Group h="100%" px="md" justify="space-between">
-          <Group>
+        <Group 
+          h="100%" 
+          px={isMobile ? 'sm' : 'md'} 
+          justify="space-between"
+          wrap="nowrap"
+        >
+          <Group gap={isMobile ? 'xs' : 'sm'} wrap="nowrap">
             <Burger
               opened={opened}
               onClick={toggle}
               hiddenFrom="md"
-              size="md"
+              size={isMobile ? 'sm' : 'md'}
             />
-            <Text size="lg" fw={600}>
-              Black Tie Menswear
+            <Text size={isMobile ? 'md' : 'lg'} fw={600} style={{ whiteSpace: 'nowrap' }}>
+              {isMobile ? 'Black Tie' : 'Black Tie Menswear'}
             </Text>
           </Group>
-          <Group>
+          <Group gap={isMobile ? 'xs' : 'sm'} wrap="nowrap">
             <Button
               component={Link}
               to={ROUTES.SETTINGS}
               variant={location.pathname === ROUTES.SETTINGS ? 'filled' : 'subtle'}
-              size="sm"
-              leftSection={<IconSettings style={{ width: rem(16), height: rem(16) }} />}
+              size={isMobile ? 'xs' : 'sm'}
+              leftSection={!isMobile ? <IconSettings style={{ width: rem(16), height: rem(16) }} /> : undefined}
             >
-              Settings
+              {isMobile ? <IconSettings style={{ width: rem(18), height: rem(18) }} /> : 'Settings'}
             </Button>
             <Button
               variant="light"
               color="red"
-              size="sm"
-              leftSection={<IconLogout style={{ width: rem(16), height: rem(16) }} />}
+              size={isMobile ? 'xs' : 'sm'}
+              leftSection={!isMobile ? <IconLogout style={{ width: rem(16), height: rem(16) }} /> : undefined}
               onClick={async () => {
                 await logout()
                 navigate(ROUTES.LOGIN, { replace: true })
               }}
             >
-              Logout
+              {isMobile ? <IconLogout style={{ width: rem(18), height: rem(18) }} /> : 'Logout'}
             </Button>
           </Group>
         </Group>
       </AppShell.Header>
 
-      <AppShell.Navbar p="md">
+      <AppShell.Navbar p={isMobile ? 'sm' : 'md'}>
         {navItems.map((item) => (
           <NavLink
             key={item.href}
@@ -113,7 +119,12 @@ export function AppLayout({ children }: AppLayoutProps) {
                 toggle()
               }
             }}
-            style={{ minHeight: '44px' }}
+            style={{ 
+              minHeight: isMobile ? '48px' : '44px',
+              fontSize: isMobile ? '16px' : '14px',
+              borderRadius: '8px',
+              marginBottom: isMobile ? '4px' : '2px'
+            }}
           />
         ))}
       </AppShell.Navbar>
